@@ -9,6 +9,7 @@ use App\Models\Beneficiary;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\ClientFxRequirement;
+use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
     //
@@ -216,7 +217,8 @@ class AdminController extends Controller
     {
         $clients = Client::all();
         $data = [];
-
+        $currentUser = Auth::user();
+        
         foreach ($clients as $client) {
             $user = User::where('parent_id', $client->id)
                         ->orWhere('client_id', $client->id)
@@ -243,6 +245,8 @@ class AdminController extends Controller
                 'kyc status' => null,
                 'customer type' => 'Business',
                 'registered on' => $client->created_at,
+                'manage by' => $currentUser->first_name
+
            
 
             ];
