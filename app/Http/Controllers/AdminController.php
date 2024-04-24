@@ -224,8 +224,8 @@ class AdminController extends Controller
                         ->orWhere('client_id', $client->id)
                         ->first();
         
-            // Assign status to client
-       
+           
+
             $contactCount = User::whereNull('parent_id')
             ->where('client_id', $client->id)
             ->count();
@@ -244,11 +244,8 @@ class AdminController extends Controller
                 'forward trading' => null,
                 'kyc status' => null,
                 'customer type' => 'Business',
-                'registered on' => $client->created_at,
-                'manage by' => $currentUser->first_name
-
-           
-
+                'registered on' => $client->created_at->format('d-m-Y'),
+                'account manager' => $currentUser->firstname.' '.$currentUser->lastname
             ];
         }
         

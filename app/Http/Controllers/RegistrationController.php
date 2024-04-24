@@ -95,7 +95,7 @@ class RegistrationController extends Controller
             $client->address = $request->address;
             $client->business_name = $request->business_name;
             $client->registration_no = $request->registration_no;
-            $client->country = $request->country;
+            $client->country_id = $request->country_id;
             $client->post_code = $request->post_code;
             $client->payment_type_id = $request->payment_type_id;
             $client->category_id = $request->category_id;
@@ -124,7 +124,6 @@ class RegistrationController extends Controller
                 'address' => 'required|string',
                 'business_name' => 'required|string',
                 'registration_no' => 'nullable|string',
-                'country' => 'required|string',
                 'post_code' => 'required|string',
                 'business_address' => 'required|string',
                 'website' => 'nullable|url',
@@ -143,7 +142,7 @@ class RegistrationController extends Controller
             $client->address = $request->address;
             $client->business_name = $request->business_name;
             $client->registration_no = $request->registration_no;
-            $client->country = $request->country;
+            $client->country_id = $request->country_id;
             $client->post_code = $request->post_code;
             $client->payment_type_id = $request->payment_type_id;
             $client->category_id = $request->category_id;

@@ -22,7 +22,8 @@ return new class extends Migration
             $table->string('address');
             $table->string('business_name');
             $table->string('registration_no')->nullable();
-            $table->string('country');
+            $table->unsignedBigInteger('country_id'); // Make nullable
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
             $table->string('post_code');
             $table->unsignedBigInteger('payment_type_id'); // Make nullable
             $table->foreign('payment_type_id')->references('id')->on('payment_types')->onDelete('set null');
