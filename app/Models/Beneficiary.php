@@ -25,4 +25,8 @@ class Beneficiary extends Model
     {
         return $this->belongsTo(Client::class);
     }
+    public function deals()
+    {
+        return $this->hasMany(Deal::class);
+    }
 }

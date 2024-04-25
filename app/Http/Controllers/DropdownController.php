@@ -111,4 +111,10 @@ class DropdownController extends Controller
 
         return response()->json(['data' => $phone_code, 'status_code' => 200]);
     }
+    public function getCurrencyCode(){
+        $currencyCode = DB::table('currencies')->select('code')->get();
+
+        
+        return response()->json(['data' => $currencyCode, 'status_code' => 200]);
+    }
 }

@@ -25,28 +25,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::group(['middleware' => 'auth:sanctum'], function () {
  
-
-    Route::post('/logout', [RegistrationController::class, 'logout']);
-
-});
-///////////////Admin Middleware ///////////////////
-Route::group(['middleware' => 'auth:sanctum'], function () {
-    
-Route::middleware('admin')->group(function () {
-    // Define admin routes here
-    Route::get('/getAllClients', [AdminController::class, 'index']);
-    Route::get('/clients/{id}', [AdminController::class,'show']);
-    Route::get('/client/Search', [AdminController::class, 'search']);
-});
-Route::middleware('client')->group(function () {
-    // Define client routes here
-    Route::post('/registerBusiness', [RegistrationController::class, 'registerBusiness']);  
- 
-  
-
-    // routes/api.php
-  
-
     Route::get('/paymentTypes',[DropdownController::class, 'payment_types']);
     Route::get('/categories',[DropdownController::class, 'categories']);
     Route::get('/subCategories',[DropdownController::class, 'subCategories']);
@@ -61,11 +39,36 @@ Route::middleware('client')->group(function () {
 
     Route::get('/priceRanges', [DropdownController::class, 'priceRanges']);
     Route::get('/countries', [DropdownController::class, 'countries']);
-
-    Route::get('/mediums', [DropdownController::class, 'mediums']);
-
-    //////////beneficiary ///////////////
     Route::get('/getAllPhoneCode', [DropdownController::class, 'getAllPhoneCode']);
+    Route::get('/mediums', [DropdownController::class, 'mediums']);
+    Route::get('/getCurrencyCode', [DropdownController::class, 'getCurrencyCode']);
+
+
+    Route::post('/logout', [RegistrationController::class, 'logout']);
+
+});
+///////////////Admin Middleware ///////////////////
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    
+Route::middleware('admin')->group(function () {
+    // Define admin routes here
+    Route::get('/getAllClients', [AdminController::class, 'index']);
+    Route::get('/clients/{id}', [AdminController::class,'show']);
+    Route::get('/client/Search', [AdminController::class, 'search']);
+
+    Route::get('clients/{client_id}/beneficiaries', [AdminController::class, 'allBeneficiaries']);
+    Route::get('/beneficiaries/search', [AdminController::class, 'searchBeneficiaries']);
+    Route::post('/makeDeals', [AdminController::class, 'makeDeal']);
+    Route::get('/deals', [AdminController::class, 'getAllDeals']);
+
+    
+});
+Route::middleware('client')->group(function () {
+    // Define client routes here
+    Route::post('/registerBusiness', [RegistrationController::class, 'registerBusiness']);  
+ 
+    //////////beneficiary ///////////////
+    
     Route::post('/addBeneficiaryIndividual', [ClientController::class, 'addBeneficiaryIndividual']);
     Route::post('/addBeneficiaryBusiness', [ClientController::class, 'addBeneficiaryBusiness']);
     Route::get('/allBeneficiaries', [ClientController::class, 'index']);

@@ -21,9 +21,13 @@ return new class extends Migration
             $table->decimal('margin', 10, 2);
             $table->decimal('revenue', 10, 2);
             $table->date('value_date');
-            $table->boolean('add_beneficiaries_now')->default(false);
+            $table->unsignedBigInteger('client_id'); // Not nullable
+            $table->unsignedBigInteger('beneficiary_id')->nullable();
+            $table->foreign('beneficiary_id')->references('id')->on('beneficiaries')->onDelete('cascade');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->decimal('total_payable_amount', 10, 2);
             $table->decimal('total_fees', 10, 2);
+            $table->string('status')->default('Awaiting Funds');
             $table->decimal('purchase_amount_remaining', 10, 2);
             $table->timestamps();
         });

@@ -101,7 +101,7 @@ class ClientController extends Controller
 
 
     $user = Auth::user();
-   
+    $client = Client::where('id' ,'=',$user->client_id)->first();
     // $phoneCode = $request->input('phone_code');
     // $contactNo = $request->input('contact_no');
     // $phoneNumber = null;
@@ -112,7 +112,7 @@ class ClientController extends Controller
     
     // Create beneficiary
     $beneficiary = Beneficiary::create([
-        'client_id' => $user->id, // Assuming you're using authentication
+        'client_id' => $client->id, // Assuming you're using authentication
         'country_id' => $request->country_id,
         'currency_id' => $request->currency_id,
         'full_name' => $request->full_name,
@@ -143,10 +143,10 @@ class ClientController extends Controller
 
 
    $user = Auth::user();
-
+   $client = Client::where('id' ,'=',$user->client_id)->first();
    // Create beneficiary
    $beneficiary = Beneficiary::create([
-       'client_id' => $user->id, // Assuming you're using authentication
+       'client_id' => $client->id, // Assuming you're using authentication
        'country_id' => $request->country_id,
        'currency_id' => $request->currency_id,
        'business_name' => $request->business_name,
