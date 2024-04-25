@@ -26,7 +26,7 @@ class AdminController extends Controller
         $email = $request->input('email');
         $registeredDateFrom = $request->input('registered_from');
         //   $registeredFrom = \DateTime::createFromFormat('d-m-Y', $registeredDateFrom)->format('Y-m-d');
-          
+
         $registeredDateTo = $request->input('registered_to');
 
         if (!isset($registeredDateFrom) && !isset($registeredDateTo)) {
@@ -55,164 +55,152 @@ class AdminController extends Controller
         // Query to search clients
         // Case 1
         if ($firstName !== null && $id !== null && $phoneNo !== null && $email !== null) {
-           
-                $results = Client::where('first_name', $firstName)
-                    ->where('id', $id)
-                    ->where('phone_no', $phoneNo)
-                    ->where('email', $email)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->where('id', $id)
+                ->where('phone_no', $phoneNo)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 2
         else if ($firstName !== null && $id !== null && $phoneNo !== null && $email === null) {
-           
-                $results = Client::where('first_name', $firstName)
-                    ->where('id', $id)
-                    ->where('phone_no', $phoneNo)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->where('id', $id)
+                ->where('phone_no', $phoneNo)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 3
         else if ($firstName !== null && $id !== null && $phoneNo === null && $email !== null) {
-            
-                $results = Client::where('first_name', $firstName)
-                    ->where('id', $id)
-                    ->where('email', $email)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->where('id', $id)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 4
         else if ($firstName !== null && $id !== null && $phoneNo === null && $email === null) {
-           
-                $results = Client::where('first_name', $firstName)
-                    ->where('id', $id)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-          
+
+            $results = Client::where('first_name', $firstName)
+                ->where('id', $id)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 5
         else if ($firstName !== null && $id === null && $phoneNo !== null && $email !== null) {
-         
-                $results = Client::where('first_name', $firstName)
-                    ->where('phone_no', $phoneNo)
-                    ->where('email', $email)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->where('phone_no', $phoneNo)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 6
         else if ($firstName !== null && $id === null && $phoneNo !== null && $email === null) {
-            
-                $results = Client::where('first_name', $firstName)
-                    ->where('phone_no', $phoneNo)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->where('phone_no', $phoneNo)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 7
         else if ($firstName !== null && $id === null && $phoneNo === null && $email !== null) {
-            
-                $results = Client::where('first_name', $firstName)
-                    ->where('email', $email)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 8
         else if ($firstName !== null && $id === null && $phoneNo === null && $email === null) {
-           
-                $results = Client::where('first_name', $firstName)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('first_name', $firstName)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 9
         else if ($firstName === null && $id !== null && $phoneNo !== null && $email !== null) {
-          
-                $results = Client::where('id', $id)
-                    ->where('phone_no', $phoneNo)
-                    ->where('email', $email)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('id', $id)
+                ->where('phone_no', $phoneNo)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 10
         else if ($firstName === null && $id !== null && $phoneNo !== null && $email === null) {
-           
-                $results = Client::where('id', $id)
-                    ->where('phone_no', $phoneNo)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('id', $id)
+                ->where('phone_no', $phoneNo)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 11
         else if ($firstName === null && $id !== null && $phoneNo === null && $email !== null) {
-          
-                $results = Client::where('id', $id)
-                    ->where('email', $email)
-                    ->whereBetween('created_at', [$registeredFrom, $registeredTo])
-                    ->get();
-            
+
+            $results = Client::where('id', $id)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
         }
 
         // Case 12
         else if ($firstName === null && $id !== null && $phoneNo === null && $email === null) {
-           //  dd($registeredFrom);
+            //  dd($registeredFrom);
             $results = Client::where('id', $id)
                 ->whereBetween('created_at', [$registeredFrom, $registeredTo])
                 ->get();
-
-        } 
+        }
 
         if ($results->isEmpty()) {
             return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
-        }else{
-        foreach ($results as $client) {
-            $user = User::where('parent_id', $client->id)
-                ->Where('client_id', $client->id)
-                ->first();
+        } else {
+            foreach ($results as $client) {
+                $user = User::where('parent_id', $client->id)
+                    ->Where('client_id', $client->id)
+                    ->first();
 
 
 
-            $contactCount = User::whereNull('parent_id')
-                ->where('client_id', $client->id)
-                ->count();
-            $beneficiariesCount = Beneficiary::where('client_id', $client->id)->count();
-            // Push client data to the array
-            $data[] = [
-                'client_code ' => $client->id,
-                'status' => $user->status,
-                'client_name' => $client->first_name . ' ' . $client->last_name,
-                'client_email' => $client->email,
-                'no_of_contact' => $contactCount,
-                'phone_no' => $client->phone_no,
-                'spot' => null,
-                'forward' => null,
-                'beneficiary' => $beneficiariesCount,
-                'spot trading' => null,
-                'forward trading' => null,
-                'kyc status' => null,
-                'customer type' => 'Business',
-                'registered on' => $client->created_at->format('d-m-Y'),
-                'account manager' => $currentUser->firstname . ' ' . $currentUser->lastname
-            ];
+                $contactCount = User::whereNull('parent_id')
+                    ->where('client_id', $client->id)
+                    ->count();
+                $beneficiariesCount = Beneficiary::where('client_id', $client->id)->count();
+                // Push client data to the array
+                $data[] = [
+                    'client_code ' => $client->id,
+                    'status' => $user->status,
+                    'client_name' => $client->first_name . ' ' . $client->last_name,
+                    'client_email' => $client->email,
+                    'no_of_contact' => $contactCount,
+                    'phone_no' => $client->phone_no,
+                    'spot' => null,
+                    'forward' => null,
+                    'beneficiary' => $beneficiariesCount,
+                    'spot trading' => null,
+                    'forward trading' => null,
+                    'kyc status' => null,
+                    'customer type' => 'Business',
+                    'registered on' => $client->created_at->format('d-m-Y'),
+                    'account manager' => $currentUser->firstname . ' ' . $currentUser->lastname
+                ];
+            }
         }
-    }
 
-      
+
 
 
         return response()->json(['data' => $data, 'status_code' => 200]);
@@ -496,8 +484,10 @@ class AdminController extends Controller
     {
         // Validate the request data
         $request->validate([
-            'buy' => 'required|string',
-            'sell' => 'required|string',
+            'buy_amount' => 'required|numeric|min:0',
+            'sell_amount' => 'required|numeric|min:0',
+            'buy_currency' => 'required|string',
+            'sell_currency' => 'required|string',
             'market_rate' => 'required|numeric|min:0',
             'suggested_exchange_rate' => 'required|numeric|min:0',
             're_quoted_rate' => 'required|numeric|min:0',
@@ -512,8 +502,10 @@ class AdminController extends Controller
         // Create a new deal instance
         $deal = new Deal();
         $deal->client_id = $request->client_id;
-        $deal->buy = $request->buy.' '.$request->buy_currency;
-        $deal->sell = $request->sell.' '.$request->sell_currency;
+        $deal->buy_amount = $request->buy_amount;
+        $deal->buy_currency = $request->buy_currency;
+        $deal->sell_amount = $request->sell_amount;
+        $deal->sell_currency = $request->sell_currency;
         $deal->market_rate = $request->market_rate;
         $deal->suggested_exchange_rate = $request->suggested_exchange_rate;
         $deal->re_quoted_rate = $request->re_quoted_rate;
@@ -529,23 +521,86 @@ class AdminController extends Controller
         $deal->save();
 
         // Return a success response
-        return response()->json(['message' => 'Deal created successfully','status code' => 201], 201);
+        return response()->json(['message' => 'Deal created successfully', 'status code' => 201], 201);
     }
 
     public function getAllDeals()
     {
         // Retrieve all deals
         $deals = Deal::get();
-        $user = Auth::user()
-;        foreach($deals as $deal){
-            $client = Client::where('id','=',$deal->client_id)->first();
-            $deal->customer_name = $client->first_name. ' '.$client->last_name;
+        $user = Auth::user();
+        foreach ($deals as $deal) {
+            $client = Client::where('id', '=', $deal->client_id)->first();
+            $deal->customer_name = $client->first_name . ' ' . $client->last_name;
             $deal->trade_date = $deal->created_at;
             $deal->value_date = $deal->created_at;
-            $deal->manage_by = $user->firstname.' '.$user->lastname;
+            $deal->manage_by = $user->firstname . ' ' . $user->lastname;
         }
 
         // Return the deals as JSON response
         return response()->json(['data' => $deals, 'status code' => 200]);
+    }
+    public function searchDeals(Request $request){
+        $customerName = $request->input('customer_name');
+        $clientCode = $request->input('client_code');
+        $dealNo = $request->input('deal_no');
+        $startFrom = $request->input('start_from');
+        $endTo = $request->input('end_to');
+        $sellCurrency = $request->input('sell_currency');
+        $buyCurrency = $request->input('buy_currency');
+        $status = $request->input('status');
+
+         // Build query
+         $query = Deal::query();
+
+         if ($customerName) {
+             $query->whereHas('client', function ($query) use ($customerName) {
+                 $query->where('first_name', 'like', '%' . $customerName . '%');
+             });
+         }
+ 
+         if ($clientCode) {
+             $query->whereHas('client', function ($query) use ($clientCode) {
+                 $query->where('id', $clientCode);
+             });
+         }
+ 
+         if ($dealNo) {
+             $query->where('id', $dealNo);
+         }
+ 
+         if ($startFrom && $endTo) {
+             $query->whereBetween('created_at', [$startFrom, $endTo]);
+         }
+ 
+         if ($sellCurrency) {
+             $query->where('sell_currency', $sellCurrency);
+         }
+ 
+         if ($buyCurrency) {
+             $query->where('buy_currency', $buyCurrency);
+         }
+ 
+         if ($status) {
+             $query->where('status', $status);
+         }
+         $user = Auth::user();
+ 
+         // Execute the query
+         $results = $query->get();
+         foreach ($results as $deal) {
+            $client = Client::where('id', '=', $deal->client_id)->first();
+            
+            $deal->customer_name = $client->first_name . ' ' . $client->last_name;
+            $deal->trade_date = $deal->created_at;
+            $deal->value_date = $deal->created_at;
+            $deal->manage_by = $user->firstname . ' ' . $user->lastname;
+        }
+         if ($results->isEmpty()) {
+            return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
+        }else{
+            return response()->json(['data' => $results, 'status_code' => 200]);
+        }
+      
     }
 }

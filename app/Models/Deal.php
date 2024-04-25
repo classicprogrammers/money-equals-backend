@@ -13,4 +13,8 @@ class Deal extends Model
     {
         return $this->belongsTo(Beneficiary::class);
     }
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 }

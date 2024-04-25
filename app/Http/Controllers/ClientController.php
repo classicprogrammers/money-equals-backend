@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Client;
+use App\Models\Deal;
 use App\Models\Beneficiary;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -170,5 +171,59 @@ class ClientController extends Controller
 
         // Return response indicating success
         return response()->json(['message' => 'Beneficiary deleted successfully','status code' => 200]);
+    }
+
+    public function searchBeneficiary(Request $request){
+           // Retrieve search parameters from request
+           $name = $request->input('beneficiary_name');
+           $countryId = $request->input('country_id');
+           $currencyId = $request->input('currency_id');
+
+           $query = Beneficiary::query();
+
+        // Apply filters based on search parameters
+        if ($name) {
+            $query->where('full_name', 'like', "%$name%");
+        }
+
+        if ($countryId) {
+            $query->where('country_id', $countryId);
+        }
+
+        if ($currencyId) {
+            $query->where('currency_id', $currencyId);
+        }
+
+        // Get the results
+        $beneficiaries = $query->get();
+        foreach($beneficiaries as $benefiar){
+            $country = DB::table('countries')->where('id','=',$benefiar->country_id)->first();
+            $currency = DB::table('currencies')->where('id','=',$benefiar->currency_id)->first();
+           
+            $benefiar->country = $country->name;
+            $benefiar->currency = $currency->code;
+        }
+
+        if ($beneficiaries->isEmpty()) {
+            return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
+        }else{
+            return response()->json(['data' => $beneficiaries, 'status_code' => 200]);
+        }
+    }
+    public function clientTransection(){
+        
+    {
+        // Get the authenticated client
+        $client = Auth::user(); // Assuming the authenticated user is a client
+
+        // Retrieve all deals associated with the client
+        $deals  = Deal::where('client_id','=', $client->id)->get();
+        foreach($deals as $deal){
+           $beneficiaries = Beneficiary::where('id' ,'=', $deal->beneficiary_id )->count();
+           $deal->beneficiary = $beneficiaries;
+        }
+        // Return the deals as JSON response
+        return response()->json(['data' => $deals, 'status_code' => 200]);
+    }
     }
 }

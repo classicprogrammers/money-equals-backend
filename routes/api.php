@@ -60,7 +60,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/beneficiaries/search', [AdminController::class, 'searchBeneficiaries']);
     Route::post('/makeDeals', [AdminController::class, 'makeDeal']);
     Route::get('/deals', [AdminController::class, 'getAllDeals']);
-
+    Route::get('/deals/search', [AdminController::class, 'searchDeals']);
     
 });
 Route::middleware('client')->group(function () {
@@ -74,6 +74,9 @@ Route::middleware('client')->group(function () {
     Route::get('/allBeneficiaries', [ClientController::class, 'index']);
     Route::put('/beneficiaries/{id}', [ClientController::class, 'update']);
     Route::delete('/deleteBeneficiaries/{id}', [ClientController::class, 'destroy']);
+
+    Route::get('/client-beneficiary/search', [ClientController::class, 'searchBeneficiary']);
+    Route::get('/client-transection/deals', [ClientController::class, 'clientTransection']);
 
     ///////////////////
 

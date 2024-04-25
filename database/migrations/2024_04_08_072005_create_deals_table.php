@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('deals', function (Blueprint $table) {
             $table->id();
-            $table->string('buy');
-            $table->string('sell');
+            $table->decimal('buy_amount', 10, 2); // Renamed from 'buy'
+            $table->string('buy_currency'); // New column for buy currency
+            $table->decimal('sell_amount', 10, 2); // Renamed from 'sell'
+            $table->string('sell_currency'); // New column for sell currency
             $table->decimal('market_rate', 10, 2);
             $table->decimal('suggested_exchange_rate', 10, 2);
             $table->decimal('re_quoted_rate', 10, 2);
