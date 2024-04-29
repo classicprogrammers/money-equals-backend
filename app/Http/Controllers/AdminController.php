@@ -224,7 +224,7 @@ class AdminController extends Controller
             $beneficiariesCount = Beneficiary::where('client_id', $client->id)->count();
             // Push client data to the array
             $data[] = [
-                'client_code ' => $client->id,
+                'id' => $client->id,
                 'status' => $user->status,
                 'client_name' => $client->first_name . ' ' . $client->last_name,
                 'no_of_contact' => $contactCount,
@@ -232,12 +232,12 @@ class AdminController extends Controller
                 'spot' => null,
                 'forward' => null,
                 'beneficiary' => $beneficiariesCount,
-                'spot trading' => null,
-                'forward trading' => null,
-                'kyc status' => null,
+                'spot_trading' => null,
+                'forward_trading' => null,
+                'kyc_status' => null,
                 'customer type' => 'Business',
-                'registered on' => $client->created_at->format('d-m-Y'),
-                'account manager' => $currentUser->firstname . ' ' . $currentUser->lastname
+                'registered_on' => $client->created_at->format('d-m-Y'),
+                'account_manager' => $currentUser->firstname . ' ' . $currentUser->lastname
             ];
         }
 
@@ -602,5 +602,14 @@ class AdminController extends Controller
             return response()->json(['data' => $results, 'status_code' => 200]);
         }
       
+    }
+
+    public function activateUser(Request $request, $id)
+    {
+        // Activate the user
+       $user = User::findOrFail($id);
+        $user->update(['status' => 'active']);
+
+        return response()->json(['message' => 'User activated successfully','user' => $user,'status code' => 200], 200);
     }
 }

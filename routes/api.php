@@ -6,6 +6,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\DropdownController;
 use App\Models\Client;
 
@@ -61,6 +62,7 @@ Route::middleware('admin')->group(function () {
     Route::post('/makeDeals', [AdminController::class, 'makeDeal']);
     Route::get('/deals', [AdminController::class, 'getAllDeals']);
     Route::get('/deals/search', [AdminController::class, 'searchDeals']);
+    Route::put('activateUser/{user}',  [AdminController::class, 'activateUser']);
     
 });
 Route::middleware('client')->group(function () {
@@ -78,14 +80,20 @@ Route::middleware('client')->group(function () {
     Route::get('/client-beneficiary/search', [ClientController::class, 'searchBeneficiary']);
     Route::get('/client-transection/deals', [ClientController::class, 'clientTransection']);
 
+    Route::get('/clientProfile', [ClientController::class, 'clientProfile']);
+    Route::put('/changePassword', [ClientController::class, 'changePassword']);
     ///////////////////
 
 });
 });
 
 
+Route::post('/email/verify', 'VerificationController@verifyEmail');
+Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+    ->name('verification.verify');
 
-
-
-Route::post('/register', [RegistrationController::class, 'register']);
+Route::post('forgotPassword/email', [VerificationController::class, 'sendResetLinkEmail']);
+Route::get('/password/reset/{token}', [VerificationController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset',  [VerificationController::class, 'reset']);
+Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);

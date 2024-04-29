@@ -11,6 +11,7 @@ use App\Models\ClientFxRequirementCountryMakingPayment;
 use App\Models\ClientFxRequirementPaymentPurpose;
 use App\Models\ClientFxRequirementFundSource;
 use App\Models\ClientFxRequirementCurrency;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
@@ -37,49 +38,16 @@ class RegistrationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function register(Request $request)
-    {
-         
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
-            // Add more validation rules as needed
-        ]);
-
-        // Return validation errors if any
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(),'status_code' => 422], 422);
-        }
-
-        // Create the user
-        $user = new User();
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->status = 'inactive';
-        if($request->role != null){
-            $user->role = $request->role ;
-        }
-        // Assign parent_id or client_id if needed
-
-        // Save the user to the database
-        $user->save();
-
-        // // Generate API token for the user
-        $token = $user->createToken('API Token')->plainTextToken;
-
-        // // Return the API token
-        return response()->json(['token' => $token,'status_code' => 200], 201);
-    }
+  
     public function registerBusiness(Request $request)
     {
- 
+
         $user = Auth::user();
         if ($user == null) {
             return response()->json(['message' => 'verify the user first then proceed'], 200);
         }
 
-     
+
         $client = Client::find($user->parent_id);
 
         // Check if client exists
@@ -130,7 +98,7 @@ class RegistrationController extends Controller
                 'business_phone_no' => 'required|string',
             ]);
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors(),'status_code' => 422], 422);
+                return response()->json(['errors' => $validator->errors(), 'status_code' => 422], 422);
             }
             $client = new Client();
             $client->first_name = $request->first_name;
@@ -254,78 +222,79 @@ class RegistrationController extends Controller
             }
         }
 
-           // Delete existing records for payment purpose
-           ClientFxRequirementCurrency::where('client_fx_requirement_id', $clientFxRequirementId)->delete();
-         
-           // Now, insert the new set of records for payment purpose
-           if (isset($data['currency_dealing']) && is_array($data['currency_dealing'])) {
-           
-               foreach ($data['currency_dealing'] as $currency_id) {
-                   // Create a new instance of ClientFxRequirementPaymentPurpose
-                   $currency = new ClientFxRequirementCurrency();
-   
-                   // Set the client_fx_requirement_id and purpose_id
-                   $currency->client_fx_requirement_id = $clientFxRequirementId;
-                   $currency->currency_id = $currency_id;
-   
-                   // Save the record to the database
-                   $currency->save();
-               }
-           }
+        // Delete existing records for payment purpose
+        ClientFxRequirementCurrency::where('client_fx_requirement_id', $clientFxRequirementId)->delete();
 
-        if (!empty($data['authorized_contacts'])) {
-        // Loop through the array of authorized contacts and append each contact to the array
-        foreach ($data['authorized_contacts'] as $contact) {
-            // Check if the email exists in the database
-            $existingUser = User::where('email', $contact['email'])->first();
+        // Now, insert the new set of records for payment purpose
+        if (isset($data['currency_dealing']) && is_array($data['currency_dealing'])) {
 
-            if ($existingUser) {
-                // If the email exists, check if it belongs to the current client
-                if ($existingUser->client_id === $client->id) {
+            foreach ($data['currency_dealing'] as $currency_id) {
+                // Create a new instance of ClientFxRequirementPaymentPurpose
+                $currency = new ClientFxRequirementCurrency();
 
-                    // If the email belongs to the current client, update the user
-                    $existingUser->firstname = $contact['first_name'];
-                    $existingUser->lastname = $contact['last_name'];
-                    $existingUser->dob = $contact['dob'];
-                    $existingUser->phone_no = $contact['phone_no'];
-                    $existingUser->postcode = $contact['postcode'];
-                    $existingUser->address = $contact['address'];
-                    $existingUser->country = $contact['country'];
-                    $user->role = '3';
+                // Set the client_fx_requirement_id and purpose_id
+                $currency->client_fx_requirement_id = $clientFxRequirementId;
+                $currency->currency_id = $currency_id;
 
-                    // Assign missing fields accordingly
-                    $existingUser->save();
-                } else {
-                    // If the email belongs to another client, show a proper message
-                    // You can add your message handling logic here
-                    return response()->json([
-                        'message' => 'The authorized user with same email already exist',
-                        'data' => $existingUser,
-                        'status_code' => 422
-
-                    ], 200);
-                }
-            } else {
-                // If the email doesn't exist, create a new user
-                $user = new User();
-                $user->client_id = $client->id;
-                $user->email = $contact['email'];
-                $user->firstname = $contact['first_name'];
-                $user->lastname = $contact['last_name'];
-                $user->password = bcrypt(Str::random(8));
-                $user->status = 'active';
-                $user->dob = $contact['dob'];
-                $user->phone_no = $contact['phone_no'];
-                $user->postcode = $contact['postcode'];
-                $user->address = $contact['address'];
-                $user->country = $contact['country'];
-                $user->role = '3';
-                // Assign missing fields accordingly
-
-                $user->save();
+                // Save the record to the database
+                $currency->save();
             }
         }
-    }
+
+        if (!empty($data['authorized_contacts'])) {
+            // Loop through the array of authorized contacts and append each contact to the array
+            foreach ($data['authorized_contacts'] as $contact) {
+                // Check if the email exists in the database
+                $existingUser = User::where('email', $contact['email'])->first();
+
+                if ($existingUser) {
+                    // If the email exists, check if it belongs to the current client
+                    if ($existingUser->client_id === $client->id) {
+
+                        // If the email belongs to the current client, update the user
+                        $existingUser->firstname = $contact['first_name'];
+                        $existingUser->lastname = $contact['last_name'];
+                        $existingUser->dob = $contact['dob'];
+                        $existingUser->phone_no = $contact['phone_no'];
+                        $existingUser->postcode = $contact['postcode'];
+                        $existingUser->address = $contact['address'];
+                        $existingUser->country = $contact['country'];
+                        $user->role = '3';
+
+                        // Assign missing fields accordingly
+                        $existingUser->save();
+                    } else {
+                        // If the email belongs to another client, show a proper message
+                        // You can add your message handling logic here
+                        return response()->json([
+                            'message' => 'The authorized user with same email already exist',
+                            'data' => $existingUser,
+                            'status_code' => 422
+
+                        ], 200);
+                    }
+                } else {
+                    // If the email doesn't exist, create a new user
+                    $user = new User();
+                    $user->client_id = $client->id;
+                    $user->email = $contact['email'];
+                    $user->firstname = $contact['first_name'];
+                    $user->lastname = $contact['last_name'];
+                    $user->password = bcrypt(Str::random(8));
+                    $user->status = 'active';
+                    $user->dob = $contact['dob'];
+                    $user->phone_no = $contact['phone_no'];
+                    $user->postcode = $contact['postcode'];
+                    $user->address = $contact['address'];
+                    $user->country = $contact['country'];
+                    $user->email_verified_at = now();
+                    $user->role = '3';
+                    // Assign missing fields accordingly
+
+                    $user->save();
+                }
+            }
+        }
 
 
 
@@ -333,16 +302,17 @@ class RegistrationController extends Controller
         $token = $user->createToken('Personal Access Token')->plainTextToken;
 
         //Return the token in the response
-        return response()->json(['message' => 'Client Registered successfully',
-        'token' => $token,
-        'status_code' => 200
-    ], 200);
+        return response()->json([
+            'message' => 'Client Registered successfully',
+            'token' => $token,
+            'status_code' => 200
+        ], 200);
     }
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Successfully logged out','status code' => 200]);
+        return response()->json(['message' => 'Successfully logged out', 'status code' => 200]);
     }
     /**
      * Display the specified resource.
