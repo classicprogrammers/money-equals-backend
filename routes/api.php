@@ -25,16 +25,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::group(['middleware' => 'auth:sanctum'], function () {
- 
-    Route::get('/paymentTypes',[DropdownController::class, 'payment_types']);
-    Route::get('/categories',[DropdownController::class, 'categories']);
-    Route::get('/subCategories',[DropdownController::class, 'subCategories']);
+
+    Route::get('/paymentTypes', [DropdownController::class, 'payment_types']);
+    Route::get('/categories', [DropdownController::class, 'categories']);
+    Route::get('/subCategories', [DropdownController::class, 'subCategories']);
     Route::get('/subCategories/{category_id}', [DropdownController::class, 'BasedSubCategories']);
-    Route::get('/paymentPurposes',[DropdownController::class, 'paymentPurposes']);
-    Route::get('/currencies' ,[DropdownController::class, 'currencies']);
-    Route::get('/paymentPerMonths',[DropdownController::class, 'index']);
+    Route::get('/paymentPurposes', [DropdownController::class, 'paymentPurposes']);
+    Route::get('/currencies', [DropdownController::class, 'currencies']);
+    Route::get('/paymentPerMonths', [DropdownController::class, 'index']);
     // routes/api.php
-    Route::get('/paymentSchedules',[DropdownController::class, 'PaymentSchedule']);
+    Route::get('/paymentSchedules', [DropdownController::class, 'PaymentSchedule']);
 
     Route::get('/fundSources', [DropdownController::class, 'fundSources']);
 
@@ -46,45 +46,55 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 
     Route::post('/logout', [RegistrationController::class, 'logout']);
-
 });
 ///////////////Admin Middleware ///////////////////
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    
-Route::middleware('admin')->group(function () {
-    // Define admin routes here
-    Route::get('/getAllClients', [AdminController::class, 'index']);
-    Route::get('/clients/{id}', [AdminController::class,'show']);
-    Route::get('/client/Search', [AdminController::class, 'search']);
 
-    Route::get('clients/{client_id}/beneficiaries', [AdminController::class, 'allBeneficiaries']);
-    Route::get('/beneficiaries/search', [AdminController::class, 'searchBeneficiaries']);
-    Route::post('/makeDeals', [AdminController::class, 'makeDeal']);
-    Route::get('/deals', [AdminController::class, 'getAllDeals']);
-    Route::get('/deals/search', [AdminController::class, 'searchDeals']);
-    Route::put('activateUser/{user}',  [AdminController::class, 'activateUser']);
-    
-});
-Route::middleware('client')->group(function () {
-    // Define client routes here
-    Route::post('/registerBusiness', [RegistrationController::class, 'registerBusiness']);  
- 
-    //////////beneficiary ///////////////
-    
-    Route::post('/addBeneficiaryIndividual', [ClientController::class, 'addBeneficiaryIndividual']);
-    Route::post('/addBeneficiaryBusiness', [ClientController::class, 'addBeneficiaryBusiness']);
-    Route::get('/allBeneficiaries', [ClientController::class, 'index']);
-    Route::put('/beneficiaries/{id}', [ClientController::class, 'update']);
-    Route::delete('/deleteBeneficiaries/{id}', [ClientController::class, 'destroy']);
+    Route::middleware('admin')->group(function () {
+        // Define admin routes here
+        Route::get('/getAllClients', [AdminController::class, 'index']);
+        Route::get('/clients/{id}', [AdminController::class, 'show']);
+        Route::get('/client/Search', [AdminController::class, 'search']);
 
-    Route::get('/client-beneficiary/search', [ClientController::class, 'searchBeneficiary']);
-    Route::get('/client-transection/deals', [ClientController::class, 'clientTransection']);
+        Route::get('clients/{client_id}/beneficiaries', [AdminController::class, 'allBeneficiaries']);
+        Route::get('/beneficiaries/search', [AdminController::class, 'searchBeneficiaries']);
+        Route::post('/makeDeals', [AdminController::class, 'makeDeal']);
+        Route::get('/deals', [AdminController::class, 'getAllDeals']);
+        Route::get('/deals/search', [AdminController::class, 'searchDeals']);
+        Route::put('activateUser/{user}',  [AdminController::class, 'activateUser']);
 
-    Route::get('/clientProfile', [ClientController::class, 'clientProfile']);
-    Route::put('/changePassword', [ClientController::class, 'changePassword']);
-    ///////////////////
+        Route::get('/revenue/today',  [AdminController::class, 'todayRevenue']);
+        Route::get('/revenue/previousMonth',  [AdminController::class, 'previousMonthRevenue']);
+        Route::get('/revenue/beforePreviousMonth',  [AdminController::class, 'beforePreviousMonth']);
 
-});
+
+        Route::get('/deals/today', [AdminController::class, 'totalDealsToday']); 
+    });
+    Route::middleware('client')->group(function () {
+        // Define client routes here
+        Route::post('/registerBusiness', [RegistrationController::class, 'registerBusiness']);
+
+        //////////beneficiary ///////////////
+
+        Route::post('/addBeneficiaryIndividual', [ClientController::class, 'addBeneficiaryIndividual']);
+        Route::post('/addBeneficiaryBusiness', [ClientController::class, 'addBeneficiaryBusiness']);
+        Route::get('/allBeneficiaries', [ClientController::class, 'index']);
+        Route::put('/beneficiaries/{id}', [ClientController::class, 'update']);
+        Route::delete('/deleteBeneficiaries/{id}', [ClientController::class, 'destroy']);
+
+        Route::get('/client-beneficiary/search', [ClientController::class, 'searchBeneficiary']);
+        Route::get('/client-transection/deals', [ClientController::class, 'clientTransection']);
+
+        Route::get('/clientProfile', [ClientController::class, 'clientProfile']);
+        Route::put('/changePassword', [ClientController::class, 'changePassword']);
+        ///////////////////
+
+        Route::get('/allDealsHistory', [ClientController::class, 'allDealsHistory']);
+        Route::get('/searchDealsHistory', [ClientController::class, 'searchDealsHistory']);
+
+        Route::get('/allPaymentsHistory', [ClientController::class, 'allPaymentsHistory']);
+        Route::get('/searchPaymentsHistory', [ClientController::class, 'searchPaymentsHistory']);
+    });
 });
 
 

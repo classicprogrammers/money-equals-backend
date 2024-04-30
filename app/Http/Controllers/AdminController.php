@@ -612,4 +612,44 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'User activated successfully','user' => $user,'status code' => 200], 200);
     }
+
+    public function todayRevenue()
+    {
+        $totalRevenue = Deal::sum('revenue');
+
+        return response()->json(['total_revenue' => $totalRevenue]);
+    }
+    public function previousMonthRevenue()
+    {
+        // Calculate the date range for the previous month
+        $startDate = Carbon::now()->subMonth()->startOfMonth();
+        $endDate = Carbon::now()->subMonth()->endOfMonth();
+
+        // Retrieve deals created in the previous month and sum their revenue
+        $totalRevenue = Deal::whereBetween('created_at', [$startDate, $endDate])->sum('revenue');
+
+        return response()->json(['total_revenue_previous_month' => $totalRevenue]);
+    }
+    public function beforePreviousMonth()
+    {
+        // Calculate the date range for the period before the previous month (e.g., last three months)
+        $startDate = Carbon::now()->startOfMonth()->subMonths(2)->startOfMonth();
+        $endDate = Carbon::now()->startOfMonth()->subMonths(2)->endOfMonth();
+     
+        // Retrieve deals created in the specified period and sum their revenue
+        $totalRevenue = Deal::whereBetween('created_at', [$startDate, $endDate])->sum('revenue');
+
+        return response()->json(['total_revenue_before_previous_month' => $totalRevenue]);
+    }
+
+    public function totalDealsToday()
+    {
+        // Get the current date
+        $today = Carbon::today();
+
+        // Count the number of deals created today
+        $totalDealsToday = Deal::whereDate('created_at', $today)->count();
+
+        return response()->json(['total_deals_today' => $totalDealsToday]);
+    }
 }

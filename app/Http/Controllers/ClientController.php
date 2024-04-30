@@ -273,4 +273,113 @@ class ClientController extends Controller
 
         return response()->json(['message' => 'Password changed successfully'], 200);
     }
+
+    public function allDealsHistory(Request $request)
+    {
+        $client = Auth::user();
+        
+        // Set default page size if not provided in the request
+        $perPage = $request->input('per_page', 10);
+        
+        // Retrieve deals associated with the logged-in client paginated
+        $dealHistory = Deal::where('client_id', $client->parent_id)->paginate($perPage);
+        foreach($dealHistory as $deal){
+            $beneficiaries = Beneficiary::where('id', '=', $deal->beneficiary_id)->count();
+            $deal->beneficiary = $beneficiaries;
+        }
+        
+        return response()->json(['data' => $dealHistory, 'status_code' => 200]);
+    }
+    public function searchDealsHistory(Request $request)
+    {
+        $currency = $request->input('purchase_currency');
+        $dealNo = $request->input('deal_no');
+        $startFrom = $request->input('start_from');
+        $endTo = $request->input('end_to');
+
+        $user = Auth::user();
+        $query = Deal::where('client_id', $user->parent_id);
+
+        if ($request->has('deal_no')) {
+            $query->where('id', $dealNo);
+        }
+
+
+        if ($request->has('purchase_currency')) {
+            $query->where('buy_amount', $currency);
+        }
+
+        if ($request->has('start_from')) {
+            $query->where('created_at', '>=', $startFrom);
+        }
+
+        if ($request->has('end_to')) {
+            $query->where('created_at', '<=', $endTo);
+        }
+
+        $deals = $query->get();
+
+        if ($deals->isEmpty()) {
+            return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
+        }else{
+            return response()->json(['data' => $deals, 'status_code' => 200]);
+        }
+    }
+    public function searchPaymentsHistory(Request $request){
+        // Retrieve search parameters from request
+        $name = $request->input('beneficiary_name');
+        $countryId = $request->input('country_id');
+        $currencyId = $request->input('currency_id');
+        $user = Auth::user();
+
+        $query = Beneficiary::query()->where('client_id','=', $user->parent_id);;
+      
+        // Apply filters based on search parameters
+        if ($name) {
+            $query->where(function($query) use ($name) {
+                $query->where('full_name', 'like', "%$name%")
+                      ->orWhere('business_name', 'like', "%$name%");
+            });
+        }
+
+        if ($countryId) {
+            $query->where('country_id', $countryId);
+        }
+
+        if ($currencyId) {
+            $query->where('currency_id', $currencyId);
+        }
+
+        // Get the results
+        $beneficiaries = $query->get();
+        foreach ($beneficiaries as $benefiar) {
+            $country = DB::table('countries')->where('id', '=', $benefiar->country_id)->first();
+            $currency = DB::table('currencies')->where('id', '=', $benefiar->currency_id)->first();
+
+            $benefiar->country = $country->name;
+            $benefiar->currency = $currency->code;
+        }
+
+        if ($beneficiaries->isEmpty()) {
+            return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
+        } else {
+            return response()->json(['data' => $beneficiaries, 'status_code' => 200]);
+        }
+    }
+
+    public function allPaymentsHistory()
+    {
+        $user = Auth::user();
+        $beneficiaries = Beneficiary::where('client_id','=',$user->parent_id)->paginate(10);
+        foreach($beneficiaries as $benefiar){
+            $country = DB::table('countries')->where('id','=', $benefiar->country_id)->first();
+            $benefiar->country= $country->name;
+            $currency = DB::table('currencies')->where('id','=', $benefiar->currency_id)->first();
+            $benefiar->currency= $currency->code;
+        }
+        return response()->json([
+            'data' => $beneficiaries,
+            'status_code' => 200
+        ]);
+    }
 }
