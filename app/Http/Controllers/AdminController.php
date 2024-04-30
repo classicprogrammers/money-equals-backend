@@ -468,12 +468,18 @@ class AdminController extends Controller
         }
 
 
-
-
-
-
         // Fetch search results
         $results = $query->get();
+        foreach($results as $beneficiar){
+            if (!empty($beneficiar->full_name)) {
+                // If full_name is not empty, assign it to the variable
+                $beneficiaryName = $beneficiar->full_name;
+            } else if (!empty($beneficiar->business_name)) {
+                // If full_name is empty but business_name is not empty, assign business_name to the variable
+                $beneficiaryName = $beneficiar->business_name;
+            }
+            $beneficiar->Beneficiaries = $beneficiaryName;
+        }
         if ($results->isEmpty()) {
             return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
         }
