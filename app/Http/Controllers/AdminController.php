@@ -385,7 +385,7 @@ class AdminController extends Controller
     {
         // Initialize the query
 
-        $beneficiary = $request->input('beneficiary');
+        $beneficiary = $request->input('Beneficiaries');
         //    dd($beneficiary);
         $country = $request->input('country_id');
         $iban_account_no = $request->input('iban_account_no');
@@ -651,5 +651,86 @@ class AdminController extends Controller
         $totalDealsToday = Deal::whereDate('created_at', $today)->count();
 
         return response()->json(['total_deals_today' => $totalDealsToday]);
+    }
+
+    public function allClientsdeals(Request $request, $id)
+    {
+        // Retrieve all deals
+        $deals = Deal::Where('client_id','=',$id)->get();
+        $user = Auth::user();
+        foreach ($deals as $deal) {
+            $client = Client::where('id', '=', $deal->client_id)->first();
+            $deal->customer_name = $client->first_name . ' ' . $client->last_name;
+            $deal->trade_date = $deal->created_at;
+            $deal->value_date = $deal->created_at;
+            $deal->manage_by = $user->firstname . ' ' . $user->lastname;
+            $deal->beneficiary = Beneficiary::where('client_id','=',$client->id)->count();
+        }
+
+        // Return the deals as JSON response
+        return response()->json(['data' => $deals, 'status code' => 200]);
+    }
+    public function allDealOFClient(Request $request, $id){
+
+        $customerName = $request->input('customer_name');
+        $clientCode = $request->input('client_code');
+        $dealNo = $request->input('deal_no');
+        $startFrom = $request->input('start_from');
+        $endTo = $request->input('end_to');
+        $sellCurrency = $request->input('sell_currency');
+        $buyCurrency = $request->input('buy_currency');
+        $status = $request->input('status');
+
+         // Build query
+         $query = Deal::where('client_id','=' ,$id);
+
+         if ($customerName) {
+             $query->whereHas('client', function ($query) use ($customerName) {
+                 $query->where('first_name', 'like', '%' . $customerName . '%');
+             });
+         }
+ 
+         if ($clientCode) {
+             $query->whereHas('client', function ($query) use ($clientCode) {
+                 $query->where('id', $clientCode);
+             });
+         }
+ 
+         if ($dealNo) {
+             $query->where('id', $dealNo);
+         }
+ 
+         if ($startFrom && $endTo) {
+             $query->whereBetween('created_at', [$startFrom, $endTo]);
+         }
+ 
+         if ($sellCurrency) {
+             $query->where('sell_currency', $sellCurrency);
+         }
+ 
+         if ($buyCurrency) {
+             $query->where('buy_currency', $buyCurrency);
+         }
+ 
+         if ($status) {
+             $query->where('status', $status);
+         }
+         $user = Auth::user();
+ 
+         // Execute the query
+         $results = $query->get();
+         foreach ($results as $deal) {
+            $client = Client::where('id', '=', $deal->client_id)->first();
+            
+            $deal->customer_name = $client->first_name . ' ' . $client->last_name;
+            $deal->trade_date = $deal->created_at;
+            $deal->value_date = $deal->created_at;
+            $deal->manage_by = $user->firstname . ' ' . $user->lastname;
+        }
+         if ($results->isEmpty()) {
+            return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
+        }else{
+            return response()->json(['data' => $results, 'status_code' => 200]);
+        }
     }
 }

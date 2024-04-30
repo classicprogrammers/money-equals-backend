@@ -69,6 +69,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 
         Route::get('/deals/today', [AdminController::class, 'totalDealsToday']); 
+
+
+        Route::get('clients/{client_id}/deals', [AdminController::class, 'allClientsdeals']);
+        Route::get('clients/{client_id}/deal/search', [AdminController::class, 'allDealOFClient']);
     });
     Route::middleware('client')->group(function () {
         // Define client routes here
