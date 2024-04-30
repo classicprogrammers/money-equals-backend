@@ -554,12 +554,14 @@ class AdminController extends Controller
         $customerName = $request->input('customer_name');
         $clientCode = $request->input('client_code');
         $dealNo = $request->input('deal_no');
-        $startFrom = $request->input('start_from');
-        $endTo = $request->input('end_to');
+        $formattedDateFrom = $request->input('start_from');
+        $formattedDateTo = $request->input('end_to');
         $sellCurrency = $request->input('sell_currency');
         $buyCurrency = $request->input('buy_currency');
         $status = $request->input('status');
-
+        
+        $startFrom = \DateTime::createFromFormat('d-m-Y', $formattedDateFrom)->format('Y-m-d');
+        $endTo = \DateTime::createFromFormat('d-m-Y', $formattedDateTo)->format('Y-m-d');
          // Build query
          $query = Deal::query();
 
@@ -579,9 +581,20 @@ class AdminController extends Controller
              $query->where('id', $dealNo);
          }
  
-         if ($startFrom && $endTo) {
-             $query->whereBetween('created_at', [$startFrom, $endTo]);
-         }
+         if (($startFrom !== null || $endTo !== null) && $startFrom !== $endTo) {
+            $query->where(function($q) use ($startFrom, $endTo) {
+              
+                if ($startFrom !== null && $endTo !== null) {
+                    
+                    $q->whereBetween('created_at', [$startFrom, $endTo]);
+                 
+                } elseif ($startFrom !== null) {
+                    $q->where('created_at', '>=', $startFrom);
+                } elseif ($endTo !== null) {
+                    $q->where('created_at', '<=', $endTo);
+                }
+            });
+        }
  
          if ($sellCurrency) {
              $query->where('sell_currency', $sellCurrency);
@@ -598,6 +611,8 @@ class AdminController extends Controller
  
          // Execute the query
          $results = $query->get();
+        
+    //     dd($query->toSql());
          foreach ($results as $deal) {
             $client = Client::where('id', '=', $deal->client_id)->first();
             
@@ -685,12 +700,13 @@ class AdminController extends Controller
         $customerName = $request->input('customer_name');
         $clientCode = $request->input('client_code');
         $dealNo = $request->input('deal_no');
-        $startFrom = $request->input('start_from');
-        $endTo = $request->input('end_to');
+        $formattedDateFrom = $request->input('start_from');
+        $formattedDateTo = $request->input('end_to');
         $sellCurrency = $request->input('sell_currency');
         $buyCurrency = $request->input('buy_currency');
         $status = $request->input('status');
-
+        $startFrom = \DateTime::createFromFormat('d-m-Y', $formattedDateFrom)->format('Y-m-d');
+        $endTo = \DateTime::createFromFormat('d-m-Y', $formattedDateTo)->format('Y-m-d');
          // Build query
          $query = Deal::where('client_id','=' ,$id);
 
