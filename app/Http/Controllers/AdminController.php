@@ -478,6 +478,10 @@ class AdminController extends Controller
                 // If full_name is empty but business_name is not empty, assign business_name to the variable
                 $beneficiaryName = $beneficiar->business_name;
             }
+            $country  = DB::table('countries')->where('id', $beneficiar->country_id)->first();
+            $currency  = DB::table('countries')->where('id', $beneficiar->currency_id)->first();
+            $beneficiar->country = $country->name; 
+            $beneficiar->currency = $currency->name; 
             $beneficiar->Beneficiaries = $beneficiaryName;
         }
         if ($results->isEmpty()) {
