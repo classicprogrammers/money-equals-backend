@@ -255,8 +255,6 @@ class ClientController extends Controller
         
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
-            'new_password' => 'required|min:8|different:current_password',
-            'confirm_password' => 'required|same:new_password',
         
         ]);
         if ($validator->fails()) {
@@ -266,6 +264,16 @@ class ClientController extends Controller
 
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json(['error' => 'Current password is incorrect'], 422);
+        }
+        if($request->new_password == null){
+            return response()->json(['error' => 'New password is required'], 422);
+        }
+        if($request->confirm_password == null){
+            return response()->json(['error' => 'confirm password is required'], 422);
+        }
+        if ($request->new_password !== $request->confirm_password) {
+            // Custom error response if new_password and confirm_password do not match
+            return response()->json(['error' => 'New password and confirm password do not match'], 422);
         }
 
         $user->password = Hash::make($request->new_password);

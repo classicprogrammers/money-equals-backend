@@ -631,7 +631,6 @@ class AdminController extends Controller
         //     dd($query->toSql());
         foreach ($results as $deal) {
             $client = Client::where('id', '=', $deal->client_id)->first();
-
             $deal->customer_name = $client->first_name . ' ' . $client->last_name;
             $deal->trade_date = $deal->created_at;
             $deal->value_date = $deal->created_at;
