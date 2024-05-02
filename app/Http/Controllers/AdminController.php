@@ -795,6 +795,7 @@ class AdminController extends Controller
             $deal->trade_date = $deal->created_at;
             $deal->value_date = $deal->created_at;
             $deal->manage_by = $user->firstname . ' ' . $user->lastname;
+            $deal->beneficiary = Beneficiary::where('client_id', '=', $client->id)->count();
         }
         if ($results->isEmpty()) {
             return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
