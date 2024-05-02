@@ -470,7 +470,7 @@ class AdminController extends Controller
 
         // Fetch search results
         $results = $query->get();
-        foreach($results as $beneficiar){
+        foreach ($results as $beneficiar) {
             if (!empty($beneficiar->full_name)) {
                 // If full_name is not empty, assign it to the variable
                 $beneficiaryName = $beneficiar->full_name;
@@ -480,8 +480,8 @@ class AdminController extends Controller
             }
             $country  = DB::table('countries')->where('id', $beneficiar->country_id)->first();
             $currency  = DB::table('countries')->where('id', $beneficiar->currency_id)->first();
-            $beneficiar->country = $country->name; 
-            $beneficiar->currency = $currency->name; 
+            $beneficiar->country = $country->name;
+            $beneficiar->currency = $currency->name;
             $beneficiar->Beneficiaries = $beneficiaryName;
         }
         if ($results->isEmpty()) {
@@ -550,7 +550,8 @@ class AdminController extends Controller
         // Return the deals as JSON response
         return response()->json(['data' => $deals, 'status code' => 200]);
     }
-    public function searchDeals(Request $request){
+    public function searchDeals(Request $request)
+    {
         $customerName = $request->input('customer_name');
         $clientCode = $request->input('client_code');
         $dealNo = $request->input('deal_no');
@@ -559,35 +560,50 @@ class AdminController extends Controller
         $sellCurrency = $request->input('sell_currency');
         $buyCurrency = $request->input('buy_currency');
         $status = $request->input('status');
-        
+
         $startFrom = \DateTime::createFromFormat('d-m-Y', $formattedDateFrom)->format('Y-m-d');
         $endTo = \DateTime::createFromFormat('d-m-Y', $formattedDateTo)->format('Y-m-d');
-         // Build query
-         $query = Deal::query();
+        // Build query
+        $query = Deal::query();
 
-         if ($customerName) {
-             $query->whereHas('client', function ($query) use ($customerName) {
-                 $query->where('first_name', 'like', '%' . $customerName . '%');
-             });
-         }
- 
-         if ($clientCode) {
-             $query->whereHas('client', function ($query) use ($clientCode) {
-                 $query->where('id', $clientCode);
-             });
-         }
- 
-         if ($dealNo) {
-             $query->where('id', $dealNo);
-         }
- 
-         if (($startFrom !== null || $endTo !== null) && $startFrom !== $endTo) {
-            $query->where(function($q) use ($startFrom, $endTo) {
-              
+        if ($customerName) {
+            $nameParts = explode(' ', $customerName, 2);
+            // dd($nameParts);
+            if (count($nameParts) === 2) {
+                $customerFirstName = $nameParts[0];
+                $customerLastName = $nameParts[1];
+                $query->whereHas('client', function ($query) use ($customerFirstName, $customerLastName) {
+                    $query->where(function ($query) use ($customerFirstName, $customerLastName) {
+                        $query->where('first_name', 'like', '%' . $customerFirstName . '%')
+                            ->orWhere('last_name', 'like', '%' . $customerLastName . '%');
+                    });
+                });
+            } else {
+                $query->whereHas('client', function ($query) use ($customerName) {
+                    $query->where(function ($query) use ($customerName) {
+                        $query->where('first_name', 'like', '%' . $customerName . '%')
+                            ->orWhere('last_name', 'like', '%' . $customerName . '%');
+                    });
+                });
+            }
+        }
+
+        if ($clientCode) {
+            $query->whereHas('client', function ($query) use ($clientCode) {
+                $query->where('id', $clientCode);
+            });
+        }
+
+        if ($dealNo) {
+            $query->where('id', $dealNo);
+        }
+
+        if (($startFrom !== null || $endTo !== null) && $startFrom !== $endTo) {
+            $query->where(function ($q) use ($startFrom, $endTo) {
+
                 if ($startFrom !== null && $endTo !== null) {
-                    
+
                     $q->whereBetween('created_at', [$startFrom, $endTo]);
-                 
                 } elseif ($startFrom !== null) {
                     $q->where('created_at', '>=', $startFrom);
                 } elseif ($endTo !== null) {
@@ -595,47 +611,46 @@ class AdminController extends Controller
                 }
             });
         }
- 
-         if ($sellCurrency) {
-             $query->where('sell_currency', $sellCurrency);
-         }
- 
-         if ($buyCurrency) {
-             $query->where('buy_currency', $buyCurrency);
-         }
- 
-         if ($status) {
-             $query->where('status', $status);
-         }
-         $user = Auth::user();
- 
-         // Execute the query
-         $results = $query->get();
-        
-    //     dd($query->toSql());
-         foreach ($results as $deal) {
+
+        if ($sellCurrency) {
+            $query->where('sell_currency', $sellCurrency);
+        }
+
+        if ($buyCurrency) {
+            $query->where('buy_currency', $buyCurrency);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+        $user = Auth::user();
+
+        // Execute the query
+        $results = $query->get();
+
+        //     dd($query->toSql());
+        foreach ($results as $deal) {
             $client = Client::where('id', '=', $deal->client_id)->first();
-            
+
             $deal->customer_name = $client->first_name . ' ' . $client->last_name;
             $deal->trade_date = $deal->created_at;
             $deal->value_date = $deal->created_at;
             $deal->manage_by = $user->firstname . ' ' . $user->lastname;
         }
-         if ($results->isEmpty()) {
+        if ($results->isEmpty()) {
             return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
-        }else{
+        } else {
             return response()->json(['data' => $results, 'status_code' => 200]);
         }
-      
     }
 
     public function activateUser(Request $request, $id)
     {
         // Activate the user
-       $user = User::findOrFail($id);
+        $user = User::findOrFail($id);
         $user->update(['status' => 'active']);
 
-        return response()->json(['message' => 'User activated successfully','user' => $user,'status code' => 200], 200);
+        return response()->json(['message' => 'User activated successfully', 'user' => $user, 'status code' => 200], 200);
     }
 
     public function todayRevenue()
@@ -660,7 +675,7 @@ class AdminController extends Controller
         // Calculate the date range for the period before the previous month (e.g., last three months)
         $startDate = Carbon::now()->startOfMonth()->subMonths(2)->startOfMonth();
         $endDate = Carbon::now()->startOfMonth()->subMonths(2)->endOfMonth();
-     
+
         // Retrieve deals created in the specified period and sum their revenue
         $totalRevenue = Deal::whereBetween('created_at', [$startDate, $endDate])->sum('revenue');
 
@@ -681,7 +696,7 @@ class AdminController extends Controller
     public function allClientsdeals(Request $request, $id)
     {
         // Retrieve all deals
-        $deals = Deal::Where('client_id','=',$id)->get();
+        $deals = Deal::Where('client_id', '=', $id)->get();
         $user = Auth::user();
         foreach ($deals as $deal) {
             $client = Client::where('id', '=', $deal->client_id)->first();
@@ -689,13 +704,14 @@ class AdminController extends Controller
             $deal->trade_date = $deal->created_at;
             $deal->value_date = $deal->created_at;
             $deal->manage_by = $user->firstname . ' ' . $user->lastname;
-            $deal->beneficiary = Beneficiary::where('client_id','=',$client->id)->count();
+            $deal->beneficiary = Beneficiary::where('client_id', '=', $client->id)->count();
         }
 
         // Return the deals as JSON response
         return response()->json(['data' => $deals, 'status code' => 200]);
     }
-    public function allDealOFClient(Request $request, $id){
+    public function allDealOFClient(Request $request, $id)
+    {
 
         $customerName = $request->input('customer_name');
         $clientCode = $request->input('client_code');
@@ -705,57 +721,85 @@ class AdminController extends Controller
         $sellCurrency = $request->input('sell_currency');
         $buyCurrency = $request->input('buy_currency');
         $status = $request->input('status');
-        $startFrom = \DateTime::createFromFormat('d-m-Y', $formattedDateFrom)->format('Y-m-d');
-        $endTo = \DateTime::createFromFormat('d-m-Y', $formattedDateTo)->format('Y-m-d');
-         // Build query
-         $query = Deal::where('client_id','=' ,$id);
 
-         if ($customerName) {
-             $query->whereHas('client', function ($query) use ($customerName) {
-                 $query->where('first_name', 'like', '%' . $customerName . '%');
-             });
-         }
- 
-         if ($clientCode) {
-             $query->whereHas('client', function ($query) use ($clientCode) {
-                 $query->where('id', $clientCode);
-             });
-         }
- 
-         if ($dealNo) {
-             $query->where('id', $dealNo);
-         }
- 
-         if ($startFrom && $endTo) {
-             $query->whereBetween('created_at', [$startFrom, $endTo]);
-         }
- 
-         if ($sellCurrency) {
-             $query->where('sell_currency', $sellCurrency);
-         }
- 
-         if ($buyCurrency) {
-             $query->where('buy_currency', $buyCurrency);
-         }
- 
-         if ($status) {
-             $query->where('status', $status);
-         }
-         $user = Auth::user();
- 
-         // Execute the query
-         $results = $query->get();
-         foreach ($results as $deal) {
+        //  dd($customerName);
+        if ($formattedDateFrom != null) {
+            $startFrom = \DateTime::createFromFormat('d-m-Y', $formattedDateFrom)->format('Y-m-d');
+        } else {
+            $startFrom = '1970-01-01';
+        }
+        if ($formattedDateTo != null) {
+            $endTo = \DateTime::createFromFormat('d-m-Y', $formattedDateTo)->format('Y-m-d');
+        } else {
+            $endTo = Carbon::now()->format('Y-m-d');
+        }
+
+
+        // Build query
+        $query = Deal::where('client_id', '=', $id);
+
+        if ($customerName) {
+            $nameParts = explode(' ', $customerName, 2);
+            // dd($nameParts);
+            if (count($nameParts) === 2) {
+                $customerFirstName = $nameParts[0];
+                $customerLastName = $nameParts[1];
+                $query->whereHas('client', function ($query) use ($customerFirstName, $customerLastName) {
+                    $query->where(function ($query) use ($customerFirstName, $customerLastName) {
+                        $query->where('first_name', 'like', '%' . $customerFirstName . '%')
+                            ->orWhere('last_name', 'like', '%' . $customerLastName . '%');
+                    });
+                });
+            } else {
+                $query->whereHas('client', function ($query) use ($customerName) {
+                    $query->where(function ($query) use ($customerName) {
+                        $query->where('first_name', 'like', '%' . $customerName . '%')
+                            ->orWhere('last_name', 'like', '%' . $customerName . '%');
+                    });
+                });
+            }
+        }
+
+        if ($clientCode) {
+            $query->whereHas('client', function ($query) use ($clientCode) {
+                $query->where('id', $clientCode);
+            });
+        }
+
+        if ($dealNo) {
+            $query->where('id', $dealNo);
+        }
+
+        if ($startFrom && $endTo) {
+            $query->whereBetween('created_at', [$startFrom, $endTo]);
+        }
+
+        if ($sellCurrency) {
+            $query->where('sell_currency', $sellCurrency);
+        }
+
+        if ($buyCurrency) {
+            $query->where('buy_currency', $buyCurrency);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+        $user = Auth::user();
+
+        // Execute the query
+        $results = $query->get();
+        foreach ($results as $deal) {
             $client = Client::where('id', '=', $deal->client_id)->first();
-            
+
             $deal->customer_name = $client->first_name . ' ' . $client->last_name;
             $deal->trade_date = $deal->created_at;
             $deal->value_date = $deal->created_at;
             $deal->manage_by = $user->firstname . ' ' . $user->lastname;
         }
-         if ($results->isEmpty()) {
+        if ($results->isEmpty()) {
             return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
-        }else{
+        } else {
             return response()->json(['data' => $results, 'status_code' => 200]);
         }
     }
