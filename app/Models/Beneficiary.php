@@ -19,6 +19,7 @@ class Beneficiary extends Model
         'contact_no',
         'iban_account_no',
         'default_payment_reference',
+        'swift_code',
     ];
 
     public function client()

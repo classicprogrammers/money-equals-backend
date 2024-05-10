@@ -129,6 +129,7 @@ class ClientController extends Controller
             'contact_no' => $request->contact_no,
             'iban_account_no' => $request->iban_account_no,
             'default_payment_reference' => $request->default_payment_reference,
+            'swift_code'  => $request->swift_code
         ]);
 
         return response()->json(['message' => 'Beneficiary added successfully', 'data' => $beneficiary, 'status code' => 201], 201);
@@ -154,6 +155,7 @@ class ClientController extends Controller
         $user = Auth::user();
         $client = Client::where('id', '=', $user->client_id)->first();
         // Create beneficiary
+     //   dd($request->swift_code);
         $beneficiary = Beneficiary::create([
             'client_id' => $client->id, // Assuming you're using authentication
             'country_id' => $request->country_id,
@@ -164,6 +166,7 @@ class ClientController extends Controller
             'contact_no' => $request->contact_no,
             'iban_account_no' => $request->iban_account_no,
             'default_payment_reference' => $request->default_payment_reference,
+            'swift_code'  => $request->swift_code,
         ]);
 
         return response()->json(['message' => 'Beneficiary added successfully', 'data' => $beneficiary, 'status code' => 201], 201);
@@ -389,5 +392,33 @@ class ClientController extends Controller
             'data' => $beneficiaries,
             'status_code' => 200
         ]);
+    }
+    public function dealsDetail($id)
+    {
+        $deal = Deal::find($id);
+        $beneficiaries = [];
+   
+                $client = Client::where('id','=', $deal->client_id)->first();
+                $deal->client_name = $client->first_name .' '.$client->last_name;
+                $beneficary = Beneficiary::where('id','=',$deal->beneficiary_id)->first();
+                if($beneficary->full_name === null){
+                    $deal->beneficiary_name = $beneficary->business_name;
+                }else if($beneficary->business_name === null){
+                    $deal->beneficiary_name = $beneficary->full_name;
+
+                }
+              $country = DB::table('countries')->where('id','=',$beneficary->country_id)->first();
+              $deal->beneficiary_country = $country->name;
+              $deal->beneficiary_date = $beneficary->created_at->format('Y-h-m');
+            
+     
+        
+        
+
+        if (!$deal) {
+            return response()->json(['error' => 'Deal not found'], 404);
+        }
+
+        return response()->json(['deal' => $deal,'status code' => 201]);
     }
 }

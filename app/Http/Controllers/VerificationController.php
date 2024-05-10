@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 class VerificationController extends Controller
 {
@@ -43,7 +44,9 @@ class VerificationController extends Controller
 
     public function sendResetLinkEmail(Request $request)
     {
+     
         $request->validate(['email' => 'required|email']);
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
@@ -55,7 +58,35 @@ class VerificationController extends Controller
                     ? response()->json(['message' => 'Reset link sent to your email'], 200)
                     : response()->json(['message' => 'Unable to send reset link'], 400);
     }
-
+    // public function sendResetLinkEmail(Request $request)
+    // {
+    //     $request->validate(['email' => 'required|email']);
+    
+    //     $user = User::where('email', $request->email)->first();
+    
+    //     if (!$user) {
+    //         return response()->json(['message' => 'Email Not Valid'], 404);
+    //     }
+    
+    //     // Generate a token for the reset password link
+    //     $token = \Illuminate\Support\Str::random(60);
+    
+    //     // Save the token in the password_resets table
+    //     DB::table('password_reset_tokens')->insertOrUpdate([
+    //         'email' => $request->email,
+    //         'token' => $token,
+    //         'created_at' => now()
+    //     ]);
+    
+    //     // Construct the custom reset password URL
+    //     $resetLink = 'http://localhost:3000/resetPassword/' . $token;
+    
+    //     // Send the reset password email using Laravel's built-in Mail class
+    //     \Illuminate\Support\Facades\Mail::to($user->email)->send(new ResetPasswordMail($resetLink));
+    
+    //     return response()->json(['message' => 'Custom reset link sent to your email'], 200);
+    // }
+    
     public function reset(Request $request)
     {
         $request->validate([

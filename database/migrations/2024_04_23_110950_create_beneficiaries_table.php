@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('contact_no')->nullable();
             $table->string('iban_account_no');
             $table->string('default_payment_reference');
-          
+            $table->string('swift_code')->nullable();
 
             // Define foreign key constraints
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');

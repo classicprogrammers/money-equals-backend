@@ -95,6 +95,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::get('/allDealsHistory', [ClientController::class, 'allDealsHistory']);
         Route::get('/searchDealsHistory', [ClientController::class, 'searchDealsHistory']);
+        Route::get('/clientDeals/{id}',  [ClientController::class, 'dealsDetail']);
 
         Route::get('/allPaymentsHistory', [ClientController::class, 'allPaymentsHistory']);
         Route::get('/searchPaymentsHistory', [ClientController::class, 'searchPaymentsHistory']);
