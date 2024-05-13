@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 class VerificationController extends Controller
@@ -89,12 +90,24 @@ class VerificationController extends Controller
     
     public function reset(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
+        
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
             'token' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status_code' => 422], 422);
+        }
 
+        $email = User::where('id', $request->id)->value('email');
+
+        if(is_null($email)){
+          return  response()->json(['message' => 'Unable to reset password'], 400);
+        }
+        $request->merge(['email' => $email]);
+        
+ 
         $response = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password) {
             $user->password = bcrypt($password);
             $user->save();
