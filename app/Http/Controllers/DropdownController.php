@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Beneficiary;
 class DropdownController extends Controller
 {
     //
@@ -116,5 +117,21 @@ class DropdownController extends Controller
 
         
         return response()->json(['data' => $currencyCode, 'status_code' => 200]);
+    }
+    public function beneficiariesDropdown(){
+        $beneficiaries = Beneficiary::select('id', 'full_name','business_name')->get();
+        // Iterate through each beneficiary to check and modify the names
+        foreach ($beneficiaries as $beneficiary) {
+            if (!$beneficiary->full_name) {
+                // If full_name is null, set it to business_name
+                $beneficiary->name = $beneficiary->business_name;
+            } elseif (!$beneficiary->business_name) {
+                // If business_name is null, set it to full_name
+                $beneficiary->name = $beneficiary->full_name;
+            }
+            unset($beneficiary->full_name);
+            unset($beneficiary->business_name);
+        }
+        return response()->json(['beneficiaries' => $beneficiaries ,'status_code' => 200]);
     }
 }

@@ -44,6 +44,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/mediums', [DropdownController::class, 'mediums']);
     Route::get('/getCurrencyCode', [DropdownController::class, 'getCurrencyCode']);
 
+    Route::get('/beneficiariesDropdown', [DropdownController::class, 'beneficiariesDropdown']);
+
 
     Route::post('/logout', [RegistrationController::class, 'logout']);
 });
@@ -73,12 +75,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::get('clients/{client_id}/deals', [AdminController::class, 'allClientsdeals']);
         Route::get('clients/{client_id}/deal/search', [AdminController::class, 'allDealOFClient']);
+        
     });
     Route::middleware('client')->group(function () {
         // Define client routes here
         Route::post('/registerBusiness', [RegistrationController::class, 'registerBusiness']);
 
         //////////beneficiary ///////////////
+        Route::get('/wallets/{client_id}', [ClientController::class, 'wallet'] );
 
         Route::post('/addBeneficiaryIndividual', [ClientController::class, 'addBeneficiaryIndividual']);
         Route::post('/addBeneficiaryBusiness', [ClientController::class, 'addBeneficiaryBusiness']);
@@ -99,6 +103,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::get('/allPaymentsHistory', [ClientController::class, 'allPaymentsHistory']);
         Route::get('/searchPaymentsHistory', [ClientController::class, 'searchPaymentsHistory']);
+
+        Route::get('/beneficiariesDropdown/{client_id}', [ClientController::class, 'beneficiariesClientDropdown']);
+        Route::post('/makeMultipleDeals', [ClientController::class, 'makeMultipleDeals']);
+        Route::get('/getAuthorizedUser', [ClientController::class, 'getAuthorizedUser']);
+        Route::post('/clientPermissions', [ClientController::class, 'clientPermission']);
+
+
     });
 });
 

@@ -24,4 +24,8 @@ class Client extends Model
     {
         return $this->hasMany(Deal::class);
     }
+    public function permissions()
+    {
+        return $this->hasMany(ClientPermission::class);
+    }
 }
