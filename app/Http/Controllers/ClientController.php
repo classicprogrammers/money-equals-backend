@@ -433,7 +433,7 @@ class ClientController extends Controller
     }
     public function beneficiariesClientDropdown($id)
     {
-        $beneficiaries = Beneficiary::select('id', 'full_name', 'business_name')->where('client_id', '=', $id)->get();
+        $beneficiaries = Beneficiary::select('id', 'full_name', 'business_name','currency_id')->where('client_id', '=', $id)->get();
         // Iterate through each beneficiary to check and modify the names
         foreach ($beneficiaries as $beneficiary) {
             if (!$beneficiary->full_name) {
@@ -443,6 +443,9 @@ class ClientController extends Controller
                 // If business_name is null, set it to full_name
                 $beneficiary->name = $beneficiary->full_name;
             }
+            $currency = DB::table('currencies')->where('id','=', $beneficiary->currency_id)->first();
+       
+            $beneficiary->currency =$currency->code;
             unset($beneficiary->full_name);
             unset($beneficiary->business_name);
         }
