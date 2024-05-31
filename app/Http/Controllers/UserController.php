@@ -42,7 +42,7 @@ class UserController extends Controller
 
         // Save the user to the database
         $user->save();
-        $user->sendEmailVerificationNotification();
+        // $user->sendEmailVerificationNotification();
         // // Generate API token for the user
         $token = $user->createToken('API Token')->plainTextToken;
         if ($request->role == '2') {
