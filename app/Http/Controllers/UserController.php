@@ -34,7 +34,7 @@ class UserController extends Controller
         $user = new User();
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        $user->status = 'inactive';
+        $user->status = 'active';
         if ($request->role != null) {
             $user->role = $request->role;
         }
@@ -77,7 +77,7 @@ class UserController extends Controller
             $user = Auth::user();
             $token = $user->createToken('Personal Access Token')->plainTextToken;
     
-            return response()->json(['token' => $token, 'status code' => 200,'user' => $user], 200);
+            return response()->json(['token' => $token,'message' => 'Logged In Successfully' ,'status code' => 200,'user' => $user], 200);
         }
     
         return response()->json(['message' => 'Invalid email or password', 'status code' => 401], 401);
