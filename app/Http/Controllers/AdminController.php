@@ -20,7 +20,29 @@ class AdminController extends Controller
 
 
         // Retrieve search parameters from the request
-        $firstName = $request->input('name');
+        $names = $request->input('name');
+       
+        ///////////////////////
+        if ($names !== null) {
+            $names = explode(' ', $names);
+            if (count($names) == 2) {
+            $firstName = $names[0];
+            $lastname = $names[1];
+            }else if (count($names) == 1) {
+                    $firstName = $names[0];
+                    $lastname = null;
+                    }
+            
+                }
+            else{
+                $firstName = null;
+                $lastname = null;
+            }
+        
+       
+
+        /////////////////
+        
         $id = $request->input('id');
         $phoneNo = $request->input('phone_no');
         $email = $request->input('email');
@@ -54,7 +76,7 @@ class AdminController extends Controller
         $currentUser = Auth::user();
         // Query to search clients
         // Case 1
-        if ($firstName !== null && $id !== null && $phoneNo !== null && $email !== null) {
+        if ($firstName !== null && $lastname === null && $id !== null && $phoneNo !== null && $email !== null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('id', $id)
@@ -65,7 +87,7 @@ class AdminController extends Controller
         }
 
         // Case 2
-        else if ($firstName !== null && $id !== null && $phoneNo !== null && $email === null) {
+        else if ($firstName !== null && $lastname === null && $id !== null && $phoneNo !== null && $email === null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('id', $id)
@@ -75,7 +97,7 @@ class AdminController extends Controller
         }
 
         // Case 3
-        else if ($firstName !== null && $id !== null && $phoneNo === null && $email !== null) {
+        else if ($firstName !== null && $lastname === null && $id !== null && $phoneNo === null && $email !== null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('id', $id)
@@ -85,7 +107,7 @@ class AdminController extends Controller
         }
 
         // Case 4
-        else if ($firstName !== null && $id !== null && $phoneNo === null && $email === null) {
+        else if ($firstName !== null && $lastname === null && $id !== null && $phoneNo === null && $email === null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('id', $id)
@@ -94,7 +116,7 @@ class AdminController extends Controller
         }
 
         // Case 5
-        else if ($firstName !== null && $id === null && $phoneNo !== null && $email !== null) {
+        else if ($firstName !== null && $lastname === null && $id === null && $phoneNo !== null && $email !== null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('phone_no', $phoneNo)
@@ -104,7 +126,7 @@ class AdminController extends Controller
         }
 
         // Case 6
-        else if ($firstName !== null && $id === null && $phoneNo !== null && $email === null) {
+        else if ($firstName !== null && $lastname === null && $id === null && $phoneNo !== null && $email === null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('phone_no', $phoneNo)
@@ -113,7 +135,7 @@ class AdminController extends Controller
         }
 
         // Case 7
-        else if ($firstName !== null && $id === null && $phoneNo === null && $email !== null) {
+        else if ($firstName !== null && $lastname === null && $id === null && $phoneNo === null && $email !== null) {
 
             $results = Client::where('first_name', $firstName)
                 ->where('email', $email)
@@ -122,7 +144,7 @@ class AdminController extends Controller
         }
 
         // Case 8
-        else if ($firstName !== null && $id === null && $phoneNo === null && $email === null) {
+        else if ($firstName !== null && $lastname === null && $id === null && $phoneNo === null && $email === null) {
 
             $results = Client::where('first_name', $firstName)
                 ->whereBetween('created_at', [$registeredFrom, $registeredTo])
@@ -130,7 +152,7 @@ class AdminController extends Controller
         }
 
         // Case 9
-        else if ($firstName === null && $id !== null && $phoneNo !== null && $email !== null) {
+        else if ($firstName === null && $lastname === null && $id !== null && $phoneNo !== null && $email !== null) {
 
             $results = Client::where('id', $id)
                 ->where('phone_no', $phoneNo)
@@ -140,7 +162,7 @@ class AdminController extends Controller
         }
 
         // Case 10
-        else if ($firstName === null && $id !== null && $phoneNo !== null && $email === null) {
+        else if ($firstName === null && $lastname === null && $id !== null && $phoneNo !== null && $email === null) {
 
             $results = Client::where('id', $id)
                 ->where('phone_no', $phoneNo)
@@ -149,7 +171,7 @@ class AdminController extends Controller
         }
 
         // Case 11
-        else if ($firstName === null && $id !== null && $phoneNo === null && $email !== null) {
+        else if ($firstName === null && $lastname === null && $id !== null && $phoneNo === null && $email !== null) {
 
             $results = Client::where('id', $id)
                 ->where('email', $email)
@@ -158,13 +180,109 @@ class AdminController extends Controller
         }
 
         // Case 12
-        else if ($firstName === null && $id !== null && $phoneNo === null && $email === null) {
+        else if ($firstName === null && $lastname === null && $id !== null && $phoneNo === null && $email === null) {
             //  dd($registeredFrom);
             $results = Client::where('id', $id)
                 ->whereBetween('created_at', [$registeredFrom, $registeredTo])
                 ->get();
         }
+        // Case 13
+        else if ($firstName !== null && $lastname !== null && $id !== null && $phoneNo !== null && $email !== null ) {
+      
+            $results = Client::where('first_name', $firstName)->where('last_name',$lastname)
+                ->where('id', $id)
+                ->where('phone_no', $phoneNo)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        // Case 14
+        else if ($firstName !== null && $lastname !== null && $id === null && $phoneNo === null && $email === null) {
 
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        // Case 15
+        else if ($firstName !== null && $lastname !== null && $id === null && $phoneNo !== null && $email === null) {
+
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->where('phone_no', $phoneNo)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+
+        // Case 16
+        else if ($firstName !== null && $lastname !== null && $id === null && $phoneNo === null && $email !== null) {
+
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        // Case 17
+        else if ($firstName !== null && $lastname !== null && $id !== null && $phoneNo === null && $email === null) {
+
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->where('id', $id)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+
+        // Case 18
+        else if ($firstName !== null && $lastname !== null && $id === null && $phoneNo !== null && $email !== null) {
+
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->where('phone_no', $phoneNo)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        // Case 19
+        else if ($firstName !== null && $lastname !== null && $id !== null && $phoneNo !== null && $email === null) {
+
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->where('id', $id)
+                ->where('phone_no', $phoneNo)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+
+        // Case 20
+        else if ($firstName !== null && $lastname !== null && $id !== null && $phoneNo === null && $email !== null) {
+
+            $results = Client::where('first_name', $firstName)->where('last_name', $lastname)
+                ->where('id', $id)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        else if ($firstName === null && $lastname === null && $id === null && $phoneNo === null && $email === null) {
+
+            $results = Client::whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        else if ($firstName === null && $lastname === null && $id === null && $phoneNo !== null && $email !== null) {
+
+            $results = Client::where('phone_no', $phoneNo)
+                ->where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        else if ($firstName === null && $lastname === null && $id === null && $phoneNo === null && $email !== null) {
+
+            $results = Client::where('email', $email)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+        else if ($firstName === null && $lastname === null && $id === null && $phoneNo !== null && $email === null) {
+
+            $results = Client::where('phone_no', $phoneNo)
+                ->whereBetween('created_at', [$registeredFrom, $registeredTo])
+                ->get();
+        }
+      
+        
         if ($results->isEmpty()) {
             return response()->json(['message' => 'No results found', 'status_code' => 404], 404);
         } else {
